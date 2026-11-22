@@ -4,6 +4,10 @@ Status: approved — V1 contract
 
 This document is the contract. Implementation follows it; consumers may rely on every field documented here.
 
+## Apex service boundary
+
+`DatatablePlusQueryService.query` accepts `DatatablePlusQueryRequest` and returns `DatatablePlusQueryResponse`. Validation failures are carried in `DatatablePlusQueryError`. All three are top-level Apex classes because LWC-callable Apex methods cannot use inner-class parameters or return values. Their serialized properties are `@AuraEnabled`, and `rows` is a `List<SObject>`. The method is read-only and uses `@AuraEnabled(cacheable=true)`.
+
 ## Component: `<c-datatable-plus>`
 
 ### Public properties
@@ -64,9 +68,11 @@ The component sends this shape to the Apex service:
 
 `sortDirection` is `ASC`, `DESC`, or `null`. `pageNumber` is 1-based. The component builds this request with shared helpers that copy field arrays, normalize lower-case sort directions to upper-case, reject unknown directions as `null`, clamp `pageNumber` to at least 1, and clamp `pageSize` to `1..200`. Non-finite page values use the defaults from the public property table.
 
+The Apex request DTO defaults are `''` for `objectApiName` and `searchTerm`, empty lists for `fields` and `searchFields`, `null` for `sortBy` and `sortDirection`, `1` for `pageNumber`, and `20` for `pageSize`.
+
 ## Query response
 
-The Apex service always returns one envelope shape:
+The Apex service always returns one envelope shape. `pageNumber` and `pageSize` echo sanitized request values, or the documented defaults when the request supplies invalid page values:
 
 ```js
 {
@@ -96,25 +102,28 @@ On an expected failure:
 
 ### Error codes
 
-| Code                   | Meaning                                                |
-| ---------------------- | ------------------------------------------------------ |
-| `INVALID_INPUT`        | Required request fields are missing or out of range.   |
-| `INVALID_OBJECT`       | Object API name does not exist or is not accessible.   |
-| `INVALID_FIELD`        | A requested field does not exist or is not accessible. |
-| `INVALID_SEARCH_FIELD` | A search field is not text-searchable.                 |
-| `QUERY_FAILED`         | SOQL execution failed unexpectedly.                    |
+| Code                   | Meaning                                                                     |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `INVALID_INPUT`        | Required request values are missing, malformed, or out of range.            |
+| `INVALID_OBJECT`       | Object API name does not exist or is not accessible.                        |
+| `INVALID_FIELD`        | A requested field does not exist, is malformed, or is not accessible.       |
+| `INVALID_SEARCH_FIELD` | A search field is malformed, unknown, inaccessible, or not text-searchable. |
+| `QUERY_FAILED`         | SOQL execution failed unexpectedly.                                         |
 
-Expected failures are returned in the envelope, not thrown as `AuraHandledException`. Unexpected Apex exceptions are caught by the service, logged, and converted to `QUERY_FAILED` with a generic message. Internal exception details never reach the client.
+Clients branch on `errorCode`; message text is diagnostic and is not part of the contract. Expected failures are returned in the envelope, not thrown as `AuraHandledException`. Unexpected Apex exceptions are caught by the service, logged, and converted to `QUERY_FAILED` with a generic message. Internal exception details never reach the client.
 
 ## Validation rules
 
-- `objectApiName`, `fields`, and `pageSize` are required.
-- `pageSize` is clamped to `1..200` at the component boundary.
-- `pageNumber` is clamped to `>= 1` at the component boundary.
-- Field API names in `fields` and `searchFields` are matched against the object describe before being placed in SOQL.
+- `objectApiName`, `fields`, `pageNumber`, and `pageSize` are required and checked again at the service boundary.
+- `pageSize` is clamped to `1..200` at the component boundary and rejected outside that range at the service boundary.
+- `pageNumber` is clamped to `>= 1` at the component boundary and rejected below one at the service boundary.
+- The computed `OFFSET` cannot exceed 2,000 rows; requests beyond that bound receive `INVALID_INPUT`.
+- Field API names in `fields` and `searchFields` are matched against the object describe before being placed in SOQL; relationship paths are rejected.
+- Requested fields and the queried object must be accessible to the running user.
 - Only `STRING`, `TEXTAREA`, `EMAIL`, `URL`, and `PHONE` fields may appear in `searchFields`.
-- Search text is bound as a parameter. It is never concatenated into SOQL text.
-- Sorting is applied only to a field present in `fields`.
+- Non-blank `searchTerm` requires at least one `searchFields` entry; a null search list is valid when search text is blank.
+- Search text is bound as a parameter. It is never concatenated into SOQL text, and the search filter applies to both rows and `totalItemCount`.
+- `sortBy` and `sortDirection` are supplied together; the direction is `ASC` or `DESC`, sorting is applied only to a field present in `fields`, and the field must be sortable.
 
 ## Compatibility notes
 

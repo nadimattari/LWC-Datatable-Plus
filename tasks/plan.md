@@ -34,14 +34,14 @@ Build the agreed Core MVP as thin vertical slices: first the shared contract and
 
 ### Phase 2: Data Service
 
-- [ ] Task 5: Add Apex request validation and response envelope
+- [x] Task 5: Add Apex request validation and response envelope
     - Acceptance: top-level request, response, and error DTOs plus validation rules are implemented; invalid input returns `ok: false` with a documented error code.
     - Verify: `npm run deploy:validate`, `npm run test:apex`, `npm run format:check`.
     - Dependencies: Task 4 and ADR-005.
     - Files likely touched: `DatatablePlusQueryRequest.cls`, `DatatablePlusQueryResponse.cls`, `DatatablePlusQueryError.cls`, `DatatablePlusQueryService.cls`, `DatatablePlusQueryServiceTest.cls`.
     - Estimated scope: M.
 
-- [ ] Task 6: Add Apex sorting, search, and pagination
+- [x] Task 6: Add Apex sorting, search, and pagination
     - Acceptance: fields are describe-validated before SOQL construction; search text is bound as a parameter; sort direction is constrained; pagination returns correct rows and total count.
     - Verify: `npm run deploy:validate`, `npm run test:apex`, `npm run format:check`.
     - Dependencies: Task 5.
@@ -50,9 +50,9 @@ Build the agreed Core MVP as thin vertical slices: first the shared contract and
 
 ### Checkpoint: Data Service
 
-- [ ] Apex tests pass with at least 75% coverage.
-- [ ] Deploy validation passes against `dtp-dev`.
-- [ ] `docs/api.md` still matches the implemented request and response shapes.
+- [x] Apex tests pass with at least 75% coverage.
+- [x] Deploy validation passes against `dtp-dev`.
+- [x] `docs/api.md` still matches the implemented request and response shapes.
 
 ### Phase 3: User Interface
 
@@ -86,7 +86,7 @@ Build the agreed Core MVP as thin vertical slices: first the shared contract and
 ### Phase 4: Verification and Release
 
 - [ ] Task 10: Complete V1 verification and documentation
-    - Acceptance: full gate passes; README, docs index, API reference, ADR statuses, and capability map reflect the shipped V1; review findings are resolved; one descriptive commit is pushed.
+    - Acceptance: full gate passes; restricted-user object/field accessibility is verified or its verification gap is documented; README, docs index, API reference, ADR statuses, and capability map reflect the shipped V1; review findings are resolved; one descriptive commit is pushed.
     - Verify: `npm run verify`, five-axis review, secret and naming scans.
     - Dependencies: Task 9.
     - Files likely touched: `README.md`, `docs/README.md`, `docs/spec.md`, `docs/api.md`, `docs/decisions/*.md`, `docs/capability-map.md`.

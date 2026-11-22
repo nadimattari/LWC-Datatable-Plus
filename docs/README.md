@@ -10,9 +10,9 @@
 - [Constraints](../CONSTRAINTS.md) — quality bar and enforcement points
 - [Decision records](decisions/) — architecture decisions and rationale, including top-level Apex DTOs
 
-## Awaiting approval
+## Execution tracking
 
-- [Implementation plan](../tasks/plan.md) — ordered slices and verification gates, awaiting human approval
-- [Task checklist](../tasks/todo.md) — ordered task checklist, awaiting human approval
+- [Implementation plan](../tasks/plan.md) — approved slices and verification gates
+- [Task checklist](../tasks/todo.md) — approved task checklist
 
 Each task updates this index when it adds or changes a document.

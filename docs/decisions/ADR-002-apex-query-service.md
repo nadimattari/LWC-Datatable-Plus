@@ -34,7 +34,7 @@ Implement one `@AuraEnabled(cacheable=true)` Apex query service and call it impe
 
 - Apex code owns field validation and SOQL construction.
 - The component owns loading, error, and request state.
-- `DatatablePlusValidation` is reused at the service boundary.
+- The query service owns validation and returns expected failures in the documented envelope; `DatatablePlusValidation` remains a standalone helper.
 - A future declarative approach must be recorded in a superseding ADR.
 
 ## Sources
