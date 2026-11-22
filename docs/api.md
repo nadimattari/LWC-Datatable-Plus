@@ -62,7 +62,7 @@ The component sends this shape to the Apex service:
 }
 ```
 
-`sortDirection` is `ASC`, `DESC`, or `null`. `pageNumber` is 1-based.
+`sortDirection` is `ASC`, `DESC`, or `null`. `pageNumber` is 1-based. The component builds this request with shared helpers that copy field arrays, normalize lower-case sort directions to upper-case, reject unknown directions as `null`, clamp `pageNumber` to at least 1, and clamp `pageSize` to `1..200`. Non-finite page values use the defaults from the public property table.
 
 ## Query response
 

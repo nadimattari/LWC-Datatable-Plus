@@ -4,7 +4,7 @@ A feature-rich Lightning Web Component datatable for the Salesforce platform. Th
 
 ## Status
 
-Task 1 complete. The Task 2 V1 specification, capability map, API contract, and decision records are approved. Official API sources are verified in [tooling decisions](docs/tooling.md); the implementation plan is awaiting approval before code starts.
+Task 4 complete. The V1 specification, capability map, API contract, decision records, and implementation plan are approved. Shared query-request helpers are covered by tests; official API sources are recorded in [tooling decisions](docs/tooling.md).
 
 ## Repository layout
 

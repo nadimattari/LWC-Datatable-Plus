@@ -24,7 +24,7 @@ Sources:
 
 ## Lightning Web Component testing
 
-LWC unit tests run through `@salesforce/sfdx-lwc-jest`, which supplies the Jest preset, LWC transformer, resolver, serializer, and base component stubs. The default config is imported into `jest.config.js` and extended with test-path exclusions and an 80% global coverage threshold. The default `force-app/main/default/lwc/**/*` coverage glob is retained because the LWC resolver exposes modules without a `.js` suffix to Jest's coverage matcher.
+LWC unit tests run through `@salesforce/sfdx-lwc-jest`, which supplies the Jest preset, LWC transformer, resolver, serializer, and base component stubs. The default config is imported into `jest.config.js` and extended with test-path exclusions and an 80% global coverage threshold. The coverage glob is overridden to `force-app/main/default/lwc/**/*.js` because the extensionless default from the preset collected no files in this project, producing an empty 0% report that silently bypassed the threshold.
 
 Source:
 

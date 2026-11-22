@@ -18,14 +18,14 @@ Build the agreed Core MVP as thin vertical slices: first the shared contract and
 
 ### Phase 1: Foundation
 
-- [ ] Task 3: Record official API citations
+- [x] Task 3: Record official API citations
     - Acceptance: `docs/tooling.md` lists each V1 reference with fetched status and the cited pattern; unreachable references are marked unverified and are not used as sources.
     - Verify: `npm run format:check`; documentation review.
     - Dependencies: none.
     - Files likely touched: `docs/tooling.md`, `docs/spec.md`, `docs/api.md`, `docs/decisions/*.md`.
     - Estimated scope: XS.
 
-- [ ] Task 4: Build shared query request helpers
+- [x] Task 4: Build shared query request helpers
     - Acceptance: request creation, page-number clamping, and page-size clamping have tests; default and boundary values are covered.
     - Verify: `npm run lint`, `npm run test:lwc:coverage`, `npm run format:check`.
     - Dependencies: Task 3.
