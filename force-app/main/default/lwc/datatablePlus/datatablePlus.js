@@ -4,8 +4,11 @@ import {
 	clampPageNumber,
 	clampPageSize,
 	createQueryRequest,
-	normalizeRows
+	normalizeRows,
+	normalizeSortDirection
 } from 'c/datatablePlusUtils'
+
+const FIRST_PAGE = 1
 
 const GENERIC_ERROR = {
 	errorCode: 'QUERY_FAILED',
@@ -46,6 +49,9 @@ export default class DatatablePlus extends LightningElement {
 	sortDirection = null
 	isLoading = false
 	error = null
+	selectedRows = []
+	selectedRowKeys = []
+	activeRequestId = 0
 
 	@api
 	get pageSize() {
@@ -56,8 +62,17 @@ export default class DatatablePlus extends LightningElement {
 		this.pageSizeValue = clampPageSize(value)
 	}
 
+	@api
+	refresh() {
+		this.loadData()
+	}
+
 	get tableColumns() {
 		return Array.isArray(this.columns) ? this.columns : []
+	}
+
+	get hasSearchFields() {
+		return Array.isArray(this.searchFields) && this.searchFields.length > 0
 	}
 
 	get normalizedTitle() {
@@ -98,7 +113,53 @@ export default class DatatablePlus extends LightningElement {
 		this.loadData()
 	}
 
+	handleSearchRequest(event) {
+		const detail = event.detail || {}
+		const value = detail.searchTerm
+
+		this.searchTerm = typeof value === 'string' ? value.trim() : ''
+		this.pageNumber = FIRST_PAGE
+		this.loadData()
+	}
+
+	handlePageRequest(event) {
+		const detail = event.detail || {}
+
+		this.pageNumber = clampPageNumber(detail.pageNumber)
+		this.loadData()
+	}
+
+	handleSort(event) {
+		const detail = event.detail || {}
+		const {fieldName, sortDirection} = detail
+		const sortBy = typeof fieldName === 'string' ? fieldName.trim() : ''
+
+		if (!sortBy) {
+			return
+		}
+
+		const direction = normalizeSortDirection(sortDirection)
+
+		this.sortBy = direction ? sortBy : null
+		this.sortDirection = direction
+		this.pageNumber = FIRST_PAGE
+		this.loadData()
+	}
+
+	handleRowSelection(event) {
+		const detail = event.detail || {}
+		const rows = Array.isArray(detail.selectedRows) ? detail.selectedRows : []
+
+		this.selectedRows = [...rows]
+		this.selectedRowKeys = rows
+			.map(row => (row ? row[this.keyField] : undefined))
+			.filter(key => key !== undefined && key !== null)
+		this.dispatchSelectionChange()
+	}
+
 	async loadData() {
+		const requestId = ++this.activeRequestId
+
 		this.isLoading = true
 
 		let response
@@ -106,9 +167,15 @@ export default class DatatablePlus extends LightningElement {
 		try {
 			response = await queryRecords(this.buildRequest())
 		} catch {
-			this.isLoading = false
-			this.applyError(null)
+			if (requestId === this.activeRequestId) {
+				this.isLoading = false
+				this.applyError(null)
+			}
 
+			return
+		}
+
+		if (requestId !== this.activeRequestId) {
 			return
 		}
 
@@ -173,6 +240,8 @@ export default class DatatablePlus extends LightningElement {
 				composed: true
 			})
 		)
+
+		this.clearSelection()
 	}
 
 	applyError(value) {
@@ -185,6 +254,27 @@ export default class DatatablePlus extends LightningElement {
 		this.dispatchEvent(
 			new CustomEvent('error', {
 				detail: {...detail},
+				bubbles: true,
+				composed: true
+			})
+		)
+
+		this.clearSelection()
+	}
+
+	clearSelection() {
+		this.selectedRows = []
+		this.selectedRowKeys = []
+		this.dispatchSelectionChange()
+	}
+
+	dispatchSelectionChange() {
+		this.dispatchEvent(
+			new CustomEvent('selectionchange', {
+				detail: {
+					selectedRows: [...this.selectedRows],
+					selectedRowKeys: [...this.selectedRowKeys]
+				},
 				bubbles: true,
 				composed: true
 			})

@@ -9,7 +9,7 @@ Source plan: [plan.md](plan.md)
 - [x] Checkpoint: Data service tests and deploy validation pass
 - [x] Task 7: Build query controls
 - [x] Task 8: Render rows and load data in the shell
-- [ ] Task 9: Wire sorting, pagination, search, selection, and refresh
-- [ ] Checkpoint: Core UI flow tests and keyboard reachability pass
+- [x] Task 9: Wire sorting, pagination, search, selection, and refresh
+- [x] Checkpoint: Core UI flow tests and keyboard reachability pass
 - [ ] Task 10: Complete V1 verification and documentation
 - [ ] Checkpoint: All success criteria met and commit pushed

@@ -15,13 +15,25 @@
 		<p lwc:if={showEmptyState} data-id="emptyMessage" class="empty-message">
 			No records to display.
 		</p>
+		<c-query-controls
+			page-number={pageNumber}
+			page-size={pageSize}
+			total-item-count={totalItemCount}
+			search-enabled={hasSearchFields}
+			search-term={searchTerm}
+			onsearchrequest={handleSearchRequest}
+			onpagerequest={handlePageRequest}
+		></c-query-controls>
 		<lightning-datatable
 			data-id="datatable"
 			key-field={keyField}
 			columns={tableColumns}
 			data={rows}
 			is-loading={isLoading}
+			selected-rows={selectedRowKeys}
 			aria-label={tableLabel}
+			onsort={handleSort}
+			onrowselection={handleRowSelection}
 		></lightning-datatable>
 	</div>
 </template>

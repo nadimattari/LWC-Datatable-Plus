@@ -68,6 +68,10 @@ describe('c-datatable-plus shell', () => {
 		return element.shadowRoot.querySelector('lightning-datatable')
 	}
 
+	function controls() {
+		return element.shadowRoot.querySelector('c-query-controls')
+	}
+
 	it('uses the documented public defaults', async () => {
 		render()
 
@@ -364,5 +368,391 @@ describe('c-datatable-plus shell', () => {
 			pageNumber: 1,
 			pageSize: 200
 		})
+	})
+
+	it('passes active query state to the internal controls', async () => {
+		queryRecords.mockResolvedValueOnce(
+			successResponse({rows: [], totalItemCount: 42, pageNumber: 3, pageSize: 10})
+		)
+		render({objectApiName: 'Account', columns, searchFields: ['Name'], pageSize: 10})
+
+		await flushPromises()
+
+		expect(controls()).not.toBeNull()
+		expect(controls().pageNumber).toBe(3)
+		expect(controls().pageSize).toBe(10)
+		expect(controls().totalItemCount).toBe(42)
+		expect(controls().searchTerm).toBe('')
+		expect(controls().searchEnabled).toBe(true)
+	})
+
+	it('runs a trimmed search request from the first page', async () => {
+		queryRecords.mockResolvedValueOnce(successResponse({pageNumber: 3}))
+		render({objectApiName: 'Account', columns, searchFields: ['Name']})
+
+		await flushPromises()
+
+		controls().dispatchEvent(
+			new CustomEvent('pagerequest', {detail: {pageNumber: 3}, bubbles: true})
+		)
+		await flushPromises()
+		expect(queryRecords.mock.calls[1][0].pageNumber).toBe(3)
+
+		controls().dispatchEvent(
+			new CustomEvent('searchrequest', {detail: {searchTerm: '  acme  '}, bubbles: true})
+		)
+		await flushPromises()
+
+		const request = queryRecords.mock.calls[2][0]
+
+		expect(request.searchTerm).toBe('acme')
+		expect(request.pageNumber).toBe(1)
+	})
+
+	it('clears search text when a search request has no string value', async () => {
+		render({objectApiName: 'Account', columns, searchFields: ['Name']})
+
+		await flushPromises()
+
+		controls().dispatchEvent(
+			new CustomEvent('searchrequest', {detail: {searchTerm: null}, bubbles: true})
+		)
+		await flushPromises()
+
+		expect(queryRecords.mock.calls[1][0].searchTerm).toBe('')
+	})
+
+	it('runs a page request from the internal controls', async () => {
+		queryRecords
+			.mockResolvedValueOnce(successResponse({pageNumber: 3, totalItemCount: 61}))
+			.mockResolvedValueOnce(successResponse({pageNumber: 3, totalItemCount: 61}))
+		render({objectApiName: 'Account', columns, pageSize: 20})
+
+		await flushPromises()
+
+		controls().dispatchEvent(
+			new CustomEvent('pagerequest', {detail: {pageNumber: 3}, bubbles: true})
+		)
+		await flushPromises()
+
+		expect(queryRecords.mock.calls[1][0].pageNumber).toBe(3)
+		expect(controls().pageNumber).toBe(3)
+		expect(controls().totalItemCount).toBe(61)
+	})
+
+	it('maps datatable sort events to uppercase Apex sort state and resets the page', async () => {
+		queryRecords
+			.mockResolvedValueOnce(successResponse({pageNumber: 2}))
+			.mockResolvedValueOnce(successResponse({pageNumber: 2}))
+		render({objectApiName: 'Account', columns})
+
+		await flushPromises()
+
+		controls().dispatchEvent(
+			new CustomEvent('pagerequest', {detail: {pageNumber: 2}, bubbles: true})
+		)
+		await flushPromises()
+
+		table().dispatchEvent(
+			new CustomEvent('sort', {detail: {fieldName: 'Name', sortDirection: 'desc'}})
+		)
+		await flushPromises()
+
+		const request = queryRecords.mock.calls[2][0]
+
+		expect(request.sortBy).toBe('Name')
+		expect(request.sortDirection).toBe('DESC')
+		expect(request.pageNumber).toBe(1)
+	})
+
+	it('clears an active sort when the datatable reports no direction', async () => {
+		const errorHandler = jest.fn()
+		queryRecords
+			.mockResolvedValueOnce(successResponse({pageNumber: 2}))
+			.mockResolvedValueOnce(successResponse({pageNumber: 2}))
+		element = createElement('c-datatable-plus', {is: DatatablePlus})
+		element.addEventListener('error', errorHandler)
+		Object.assign(element, {objectApiName: 'Account', columns})
+		document.body.appendChild(element)
+
+		await flushPromises()
+
+		controls().dispatchEvent(
+			new CustomEvent('pagerequest', {detail: {pageNumber: 2}, bubbles: true})
+		)
+		await flushPromises()
+
+		table().dispatchEvent(
+			new CustomEvent('sort', {detail: {fieldName: 'Name', sortDirection: 'desc'}})
+		)
+		await flushPromises()
+
+		table().dispatchEvent(
+			new CustomEvent('sort', {detail: {fieldName: 'Name', sortDirection: null}})
+		)
+		await flushPromises()
+
+		const request = queryRecords.mock.calls[queryRecords.mock.calls.length - 1][0]
+
+		expect(request.sortBy).toBeNull()
+		expect(request.sortDirection).toBeNull()
+		expect(request.pageNumber).toBe(1)
+		expect(errorHandler).not.toHaveBeenCalled()
+	})
+
+	it('ignores a sort event without a field name', async () => {
+		render({objectApiName: 'Account', columns})
+
+		await flushPromises()
+
+		table().dispatchEvent(
+			new CustomEvent('sort', {detail: {fieldName: '', sortDirection: 'asc'}})
+		)
+		await flushPromises()
+
+		expect(queryRecords).toHaveBeenCalledTimes(1)
+	})
+
+	it('emits selectionchange with current rows and key values', async () => {
+		const handler = jest.fn()
+		element = createElement('c-datatable-plus', {is: DatatablePlus})
+		element.addEventListener('selectionchange', handler)
+		Object.assign(element, {objectApiName: 'Account', columns})
+		document.body.appendChild(element)
+
+		await flushPromises()
+		handler.mockClear()
+
+		const selectedRows = [
+			{Id: '001000000000001AAA', Name: 'Acme'},
+			{Id: '001000000000002AAA', Name: 'Beta'}
+		]
+		table().dispatchEvent(new CustomEvent('rowselection', {detail: {selectedRows}}))
+		await flushPromises()
+
+		expect(handler).toHaveBeenCalledTimes(1)
+		expect(handler.mock.calls[0][0].detail).toEqual({
+			selectedRows,
+			selectedRowKeys: ['001000000000001AAA', '001000000000002AAA']
+		})
+		expect(handler.mock.calls[0][0].bubbles).toBe(true)
+		expect(handler.mock.calls[0][0].composed).toBe(true)
+		expect(table().selectedRows).toEqual(['001000000000001AAA', '001000000000002AAA'])
+	})
+
+	it('skips malformed selection details and rows without a key', async () => {
+		render({objectApiName: 'Account', columns})
+
+		await flushPromises()
+
+		table().dispatchEvent(new CustomEvent('rowselection', {detail: null}))
+		expect(table().selectedRows).toEqual([])
+
+		table().dispatchEvent(new CustomEvent('rowselection', {detail: {}}))
+		expect(table().selectedRows).toEqual([])
+
+		table().dispatchEvent(
+			new CustomEvent('rowselection', {
+				detail: {selectedRows: [null, {Name: 'No key'}, {Id: null}]}
+			})
+		)
+		expect(table().selectedRows).toEqual([])
+	})
+
+	it('handles malformed interaction event details without throwing', async () => {
+		queryRecords
+			.mockResolvedValueOnce(successResponse({pageNumber: 3}))
+			.mockResolvedValueOnce(successResponse({pageNumber: 3}))
+		render({objectApiName: 'Account', columns, searchFields: ['Name']})
+
+		await flushPromises()
+
+		expect(() => {
+			controls().dispatchEvent(
+				new CustomEvent('searchrequest', {detail: null, bubbles: true})
+			)
+			controls().dispatchEvent(new CustomEvent('pagerequest', {detail: null, bubbles: true}))
+			table().dispatchEvent(new CustomEvent('sort', {detail: null}))
+		}).not.toThrow()
+		await flushPromises()
+
+		expect(queryRecords).toHaveBeenCalledTimes(3)
+		expect(queryRecords.mock.calls[1][0].searchTerm).toBe('')
+		expect(queryRecords.mock.calls[2][0].pageNumber).toBe(1)
+	})
+
+	it('clears page-scoped selection after a successful refresh', async () => {
+		const events = []
+		element = createElement('c-datatable-plus', {is: DatatablePlus})
+		element.addEventListener('datachange', () => events.push('datachange'))
+		element.addEventListener('selectionchange', () => events.push('selectionchange'))
+		Object.assign(element, {objectApiName: 'Account', columns})
+		document.body.appendChild(element)
+
+		await flushPromises()
+
+		table().dispatchEvent(
+			new CustomEvent('rowselection', {
+				detail: {selectedRows: [{Id: '001000000000001AAA', Name: 'Acme'}]}
+			})
+		)
+		await flushPromises()
+		expect(table().selectedRows).toEqual(['001000000000001AAA'])
+
+		events.length = 0
+		queryRecords.mockResolvedValueOnce(successResponse())
+		element.refresh()
+		await flushPromises()
+
+		expect(events).toEqual(['datachange', 'selectionchange'])
+		expect(table().selectedRows).toEqual([])
+	})
+
+	it('emits error before selectionchange when a refresh fails', async () => {
+		const errorHandler = jest.fn()
+		const selectionHandler = jest.fn()
+		element = createElement('c-datatable-plus', {is: DatatablePlus})
+		element.addEventListener('error', errorHandler)
+		element.addEventListener('selectionchange', selectionHandler)
+		Object.assign(element, {objectApiName: 'Account', columns})
+		document.body.appendChild(element)
+
+		await flushPromises()
+
+		table().dispatchEvent(
+			new CustomEvent('rowselection', {
+				detail: {selectedRows: [{Id: '001000000000001AAA', Name: 'Acme'}]}
+			})
+		)
+		await flushPromises()
+
+		errorHandler.mockClear()
+		selectionHandler.mockClear()
+		queryRecords.mockResolvedValueOnce(
+			failureResponse({
+				errorCode: 'QUERY_FAILED',
+				message: 'The query could not be completed.'
+			})
+		)
+		element.refresh()
+		await flushPromises()
+
+		expect(errorHandler).toHaveBeenCalledTimes(1)
+		expect(selectionHandler).toHaveBeenCalledTimes(1)
+		expect(errorHandler.mock.invocationCallOrder[0]).toBeLessThan(
+			selectionHandler.mock.invocationCallOrder[0]
+		)
+		expect(selectionHandler.mock.calls[0][0].detail).toEqual({
+			selectedRows: [],
+			selectedRowKeys: []
+		})
+	})
+
+	it('refresh() reuses the active request and returns undefined', async () => {
+		render({objectApiName: 'Account', columns, searchFields: ['Name'], pageSize: 10})
+
+		await flushPromises()
+
+		controls().dispatchEvent(
+			new CustomEvent('searchrequest', {detail: {searchTerm: 'acme'}, bubbles: true})
+		)
+		await flushPromises()
+
+		table().dispatchEvent(
+			new CustomEvent('sort', {detail: {fieldName: 'Name', sortDirection: 'asc'}})
+		)
+		await flushPromises()
+
+		const activeRequest = queryRecords.mock.calls[queryRecords.mock.calls.length - 1][0]
+
+		expect(element.refresh()).toBeUndefined()
+		await flushPromises()
+
+		expect(queryRecords.mock.calls[queryRecords.mock.calls.length - 1][0]).toEqual(
+			activeRequest
+		)
+	})
+
+	it('clears a prior error when a refresh succeeds', async () => {
+		const rows = [{Id: '001000000000001AAA', Name: 'Acme'}]
+		queryRecords.mockResolvedValueOnce(
+			failureResponse({errorCode: 'INVALID_FIELD', message: 'Field is unavailable.'})
+		)
+		render({objectApiName: 'Account', columns})
+
+		await flushPromises()
+		expect(element.shadowRoot.querySelector('[data-id="errorMessage"]')).not.toBeNull()
+
+		queryRecords.mockResolvedValueOnce(successResponse({rows}))
+		element.refresh()
+		await flushPromises()
+
+		expect(element.shadowRoot.querySelector('[data-id="errorMessage"]')).toBeNull()
+		expect(table().data).toEqual(rows)
+	})
+
+	it('ignores a stale success response after a newer request finishes', async () => {
+		let resolveFirst
+		let resolveSecond
+		queryRecords
+			.mockImplementationOnce(
+				() =>
+					new Promise(resolve => {
+						resolveFirst = resolve
+					})
+			)
+			.mockImplementationOnce(
+				() =>
+					new Promise(resolve => {
+						resolveSecond = resolve
+					})
+			)
+		const handler = jest.fn()
+		const newerRows = [{Id: '001000000000002AAA', Name: 'Beta'}]
+		const staleRows = [{Id: '001000000000001AAA', Name: 'Acme'}]
+
+		element = createElement('c-datatable-plus', {is: DatatablePlus})
+		element.addEventListener('datachange', handler)
+		Object.assign(element, {objectApiName: 'Account', columns})
+		document.body.appendChild(element)
+
+		element.refresh()
+
+		resolveSecond(successResponse({rows: newerRows}))
+		await flushPromises()
+		handler.mockClear()
+
+		resolveFirst(successResponse({rows: staleRows}))
+		await flushPromises()
+
+		expect(table().data).toEqual(newerRows)
+		expect(handler).not.toHaveBeenCalled()
+	})
+
+	it('ignores a stale rejection after a newer request finishes', async () => {
+		let rejectFirst
+		queryRecords.mockImplementationOnce(
+			() =>
+				new Promise((resolve, reject) => {
+					rejectFirst = reject
+				})
+		)
+		const handler = jest.fn()
+		const rows = [{Id: '001000000000002AAA', Name: 'Beta'}]
+
+		element = createElement('c-datatable-plus', {is: DatatablePlus})
+		element.addEventListener('error', handler)
+		Object.assign(element, {objectApiName: 'Account', columns})
+		document.body.appendChild(element)
+
+		queryRecords.mockResolvedValueOnce(successResponse({rows}))
+		element.refresh()
+		await flushPromises()
+
+		rejectFirst(new Error('stale'))
+		await flushPromises()
+
+		expect(table().data).toEqual(rows)
+		expect(handler).not.toHaveBeenCalled()
 	})
 })

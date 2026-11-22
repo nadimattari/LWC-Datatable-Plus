@@ -2,7 +2,8 @@ import {
 	clampPageNumber,
 	clampPageSize,
 	createQueryRequest,
-	normalizeRows
+	normalizeRows,
+	normalizeSortDirection
 } from 'c/datatablePlusUtils'
 
 describe('normalizeRows', () => {
@@ -49,6 +50,20 @@ describe('clampPageNumber', () => {
 		expect(clampPageNumber(0)).toBe(1)
 		expect(clampPageNumber(1)).toBe(1)
 		expect(clampPageNumber(2.9)).toBe(2)
+	})
+})
+
+describe('normalizeSortDirection', () => {
+	it.each([
+		['asc', 'ASC'],
+		[' DESC ', 'DESC'],
+		['DESC', 'DESC']
+	])('normalizes %p to %p', (value, expected) => {
+		expect(normalizeSortDirection(value)).toBe(expected)
+	})
+
+	it.each([null, undefined, '', 'sideways', 1, {}])('returns null for %p', value => {
+		expect(normalizeSortDirection(value)).toBeNull()
 	})
 })
 

@@ -35,8 +35,8 @@ function stringOr(value, fallback) {
 	return typeof value === 'string' ? value : fallback
 }
 
-function sortDirectionOrNull(value) {
-	const direction = typeof value === 'string' ? value.toUpperCase() : ''
+export function normalizeSortDirection(value) {
+	const direction = typeof value === 'string' ? value.trim().toUpperCase() : ''
 
 	return direction === 'ASC' || direction === 'DESC' ? direction : null
 }
@@ -50,7 +50,7 @@ export function createQueryRequest(input = {}) {
 		searchFields: copyArray(state.searchFields),
 		searchTerm: stringOr(state.searchTerm, ''),
 		sortBy: stringOr(state.sortBy, null),
-		sortDirection: sortDirectionOrNull(state.sortDirection),
+		sortDirection: normalizeSortDirection(state.sortDirection),
 		pageNumber: clampPageNumber(state.pageNumber),
 		pageSize: clampPageSize(state.pageSize)
 	}

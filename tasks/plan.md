@@ -70,7 +70,7 @@ Build the agreed Core MVP as thin vertical slices: first the shared contract and
     - Files likely touched: `datatablePlus/datatablePlus.html`, `.js`, `.css`, `.js-meta.xml`, `__tests__/datatablePlus.test.js`.
     - Estimated scope: M.
 
-- [ ] Task 9: Wire sorting, pagination, search, selection, and refresh
+- [x] Task 9: Wire sorting, pagination, search, selection, and refresh
     - Acceptance: base sort and selection events update state and emit documented events; query-control events trigger new requests; `refresh()` reuses the active request; a request identity prevents a stale response from overwriting newer state.
     - Verify: `npm run lint`, `npm run test:lwc:coverage`, `npm run format:check`.
     - Dependencies: Task 8.
@@ -79,9 +79,9 @@ Build the agreed Core MVP as thin vertical slices: first the shared contract and
 
 ### Checkpoint: Core UI Flow
 
-- [ ] LWC tests pass with at least 80% coverage.
-- [ ] All public properties, events, and `refresh()` are covered by tests.
-- [ ] A manual org or Jest-rendered keyboard pass confirms labelled, reachable controls.
+- [x] LWC tests pass with at least 80% coverage.
+- [x] All public properties, events, and `refresh()` are covered by tests.
+- [x] A manual org or Jest-rendered keyboard pass confirms labelled, reachable controls.
 
 ### Phase 4: Verification and Release
 

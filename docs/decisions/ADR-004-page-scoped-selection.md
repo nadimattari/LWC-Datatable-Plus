@@ -14,7 +14,7 @@ The base datatable reports selected rows for the rows it currently renders. Pres
 
 ## Decision
 
-V1 selection is page-scoped. The component clears `selectedRows` and `selectedRowKeys` after a successful query and emits `selectionchange` with the current page only.
+V1 selection is page-scoped. The component clears `selectedRows` and `selectedRowKeys` after each query result and emits `selectionchange` with the current page only.
 
 ## Alternatives Considered
 
@@ -33,7 +33,7 @@ V1 selection is page-scoped. The component clears `selectedRows` and `selectedRo
 ## Consequences
 
 - Consumers must persist selection themselves if they need cross-page workflows.
-- Pagination and search will clear selection after each successful query.
+- Pagination, search, and failed queries will clear selection after each query result.
 - A later version can add opt-in cross-page selection additively.
 
 ## Sources

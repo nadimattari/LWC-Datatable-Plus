@@ -112,6 +112,19 @@ Unverified or unavailable references:
 - `https://developer.salesforce.com/docs/platform/lwc/guide/data-wire.html` — replaced by the current wire-service URL above.
 - `https://lwc.dev/guide/wire` and `https://lwc.dev/guide/apex` — not reachable in this environment; not used as sources.
 
+## Interaction wiring
+
+The shell listens for the internal `searchrequest` and `pagerequest` events and passes the active query state back to the controls. Platform datatable sort events supply `detail.fieldName` and `detail.sortDirection` with values `asc` or `desc`; the shell normalizes the direction through the shared request helper before calling Apex. A sort event without an `ASC` or `DESC` direction clears both sort values so the service never receives a half-specified sort. Row-selection events supply `detail.selectedRows`, which is the authoritative current selection, and `selected-rows` preselects rows by key value. The shell derives `selectedRowKeys` from the key field and clears both arrays after each query result to honor the page-scoped selection decision. `refresh()` is decorated with `@api` because public methods are part of a component's API, and it starts a new imperative Apex invocation using the current request object. A monotonically increasing request identity discards late responses from superseded requests.
+
+Sources verified through the in-app browser on 2026-11-22:
+
+| Source                                                                                                                                                             | Verified pattern used by Task 9                                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Platform datatable component reference](https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-datatable.html?type=Develop) | `onsort` reads `fieldName` and `sortDirection`; `onrowselection` reads `detail.selectedRows`; `selected-rows` preselects rows by their key-field values. |
+| [Call Methods on Children](https://developer.salesforce.com/docs/platform/lwc/guide/create-javascript-methods.html)                                                | Decorate `refresh()` with `@api` to expose a public method; parents call public methods on child components.                                             |
+| [Call Apex Methods Imperatively](https://developer.salesforce.com/docs/platform/lwc/guide/apex-call-imperative.html)                                               | An imported imperative Apex function returns a promise, and the component controls when the single response is requested.                                |
+| [Create and Dispatch Events](https://developer.salesforce.com/docs/platform/lwc/guide/events-create-dispatch.html)                                                 | Custom events carry a copied `detail` object; public events set `bubbles` and `composed` so consumers outside the shadow boundary receive them.          |
+
 ## Task 1 smoke slice
 
 Two small, production-shaped files prove that the formatter, LWC test runner, deploy, and Apex test runner are wired correctly:

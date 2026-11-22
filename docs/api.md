@@ -25,9 +25,9 @@ Properties are additive. Later versions may add optional properties but will not
 
 ### Public methods
 
-| Name        | Contract                                                                                    |
-| ----------- | ------------------------------------------------------------------------------------------- |
-| `refresh()` | Re-runs the current query with unchanged sort, page, and search state. Returns `undefined`. |
+| Name        | Contract                                                                                                                     |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `refresh()` | Re-runs the current query with unchanged sort, page, and search state. Returns `undefined` and does not mutate those states. |
 
 ### Events
 
@@ -35,15 +35,17 @@ All events use a single `detail` object, bubble, and are composed.
 
 | Name              | `detail` shape                                                                | When it fires                               |
 | ----------------- | ----------------------------------------------------------------------------- | ------------------------------------------- |
-| `selectionchange` | `{selectedRows: Array, selectedRowKeys: Array}`                               | Base datatable selection changes.           |
+| `selectionchange` | `{selectedRows: Array, selectedRowKeys: Array}`                               | Selection changes or a query clears it.     |
 | `datachange`      | `{rows: Array, totalItemCount: Number, pageNumber: Number, pageSize: Number}` | A query succeeds.                           |
 | `error`           | `{errorCode: String, message: String}`                                        | A query fails, rejects, or has no response. |
 
 Event names and detail fields are stable. Consumers should ignore unknown detail fields added later.
 
+Selection is scoped to the current page. `selectedRowKeys` is derived from each selected row using `keyField`. A new query clears selection and emits `selectionchange` with empty arrays after `datachange` for a success or `error` for a failure. Sorting and search reset `pageNumber` to one; pagination preserves the current sort and search state. Each query has a request identity so a response from a superseded request cannot overwrite newer state.
+
 ### Rendering and states
 
-On insertion, the shell requests page one with no sort or search term. It sets the platform datatable's loading state while the promise is pending, then passes the returned rows, columns, and key field to the renderer. Events are dispatched only after the loading flag is cleared. A successful response clears any prior error and emits `datachange`; an error response, a rejected Apex promise, or a missing response clears the rows, shows an inline `role="alert"` message, and emits `error` with the structured code and message. A persistent polite status region announces loading, loaded, and empty results; failures are announced only by the alert so messages are not duplicated.
+On insertion, the shell requests page one with no sort or search term. Internal search and pagination controls render above the table; their events, platform datatable sort and selection events, and `refresh()` all feed the same query pipeline. The shell sets the platform datatable's loading state while the promise is pending, then passes the returned rows, columns, and key field to the renderer. Events are dispatched only after the loading flag is cleared. A successful response clears any prior error and emits `datachange`; an error response, a rejected Apex promise, or a missing response clears the rows, shows an inline `role="alert"` message, and emits `error` with the structured code and message. A persistent polite status region announces loading, loaded, and empty results; failures are announced only by the alert so messages are not duplicated.
 
 The table's accessible label is `title` when supplied, otherwise `objectApiName`, otherwise `Records`. Array properties are supplied by a wrapping component; App Builder configuration exposes only the scalar properties `objectApiName`, `keyField`, `pageSize`, and `title`.
 
@@ -155,5 +157,5 @@ Clients branch on `errorCode`; message text is diagnostic and is not part of the
 ## Compatibility notes
 
 - V1 queries one object. Relationship paths in `fieldName` are not supported.
-- Selection is page-scoped. The component clears `selectedRows` and `selectedRowKeys` after each successful query.
+- Selection is page-scoped. The component clears `selectedRows` and `selectedRowKeys` after each query result.
 - The base datatable controls cell rendering; this component does not supply a custom cell renderer in V1.
