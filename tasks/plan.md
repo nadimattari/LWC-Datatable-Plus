@@ -56,7 +56,7 @@ Build the agreed Core MVP as thin vertical slices: first the shared contract and
 
 ### Phase 3: User Interface
 
-- [ ] Task 7: Build query controls
+- [x] Task 7: Build query controls
     - Acceptance: search input emits a debounced search request; first, previous, next, and last controls emit page requests; controls are labelled and keyboard reachable.
     - Verify: `npm run lint`, `npm run test:lwc:coverage`, `npm run format:check`.
     - Dependencies: Task 4.

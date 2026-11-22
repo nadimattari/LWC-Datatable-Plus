@@ -41,6 +41,27 @@ All events use a single `detail` object, bubble, and are composed.
 
 Event names and detail fields are stable. Consumers should ignore unknown detail fields added later.
 
+## Internal query-controls contract
+
+`<c-query-controls>` is not exposed for external use. The shell owns all query state and sends these properties down:
+
+| Property         | Type    | Default | Contract                                                       |
+| ---------------- | ------- | ------- | -------------------------------------------------------------- |
+| `pageNumber`     | Number  | `1`     | Current 1-based page, clamped to at least one.                 |
+| `pageSize`       | Number  | `20`    | Rows per page, clamped to `1..200` for page calculations.      |
+| `totalItemCount` | Number  | `0`     | Total rows reported by the last successful query.              |
+| `searchTerm`     | String  | `''`    | Committed search text; also seeds the editable input value.    |
+| `searchEnabled`  | Boolean | `false` | The input is disabled until the caller supplies search fields. |
+
+The controls emit two internal events. They use one `detail` object and bubble to the immediate parent, but they do not cross the shadow boundary.
+
+| Name            | `detail` shape         | When it fires                                                |
+| --------------- | ---------------------- | ------------------------------------------------------------ |
+| `searchrequest` | `{searchTerm: String}` | After a 300 ms debounce or an explicit commit such as Enter. |
+| `pagerequest`   | `{pageNumber: Number}` | A first, previous, next, or last button is activated.        |
+
+Search text is trimmed before it is emitted. A commit event's string value takes precedence; if it has none, the latest change value is used. Blank text is emitted as `''` so the shell can clear a previous search. Boundary buttons are disabled and ignore activations that cannot change the page.
+
 ## Service boundary
 
 The Apex boundary is the static method `DatatablePlusQueryService.query(DatatablePlusQueryRequest request)`. It is annotated `@AuraEnabled(cacheable=true)` and is called imperatively from the component.

@@ -1,0 +1,22 @@
+.query-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 1rem;
+}
+
+.search-control {
+	flex: 1 1 16rem;
+	min-width: 12rem;
+}
+
+.pagination-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.page-status {
+	white-space: nowrap;
+}
