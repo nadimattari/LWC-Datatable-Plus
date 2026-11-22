@@ -1,0 +1,33 @@
+{
+	"plugins": ["prettier-plugin-apex"],
+	"useTabs": true,
+	"tabWidth": 4,
+	"printWidth": 100,
+	"semi": false,
+	"singleQuote": true,
+	"trailingComma": "none",
+	"bracketSpacing": false,
+	"arrowParens": "avoid",
+	"endOfLine": "lf",
+	"proseWrap": "preserve",
+	"overrides": [
+		{
+			"files": "*.html",
+			"options": {
+				"parser": "lwc"
+			}
+		},
+		{
+			"files": "*.cls",
+			"options": {
+				"parser": "apex"
+			}
+		},
+		{
+			"files": "*.trigger",
+			"options": {
+				"parser": "apex"
+			}
+		}
+	]
+}

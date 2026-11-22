@@ -1,0 +1,6 @@
+node_modules/
+coverage/
+.sf/
+.sfdx/
+.opencode/
+package-lock.json

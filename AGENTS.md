@@ -13,6 +13,7 @@ Use only the neutral names defined in this repository: `datatable-plus`, `<c-dat
 - Follow the skill workflow in order. Do not partially apply a skill.
 - Never skip verification steps, tests, review, or documentation updates.
 - Apply the standing checklist in `.opencode/references/definition-of-done.md` to every change.
+- Read `CONSTRAINTS.md` before writing code. Do not weaken it to make a change pass.
 
 ## Intent to skill mapping
 

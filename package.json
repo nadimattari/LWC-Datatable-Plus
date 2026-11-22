@@ -1,0 +1,28 @@
+{
+	"name": "lwc-datatable-plus",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Feature-rich Lightning Web Component datatable for the Salesforce platform",
+	"scripts": {
+		"format": "prettier --write \"**/*.{js,cls,trigger,html,css,json,md}\"",
+		"format:check": "prettier --check \"**/*.{js,cls,trigger,html,css,json,md}\"",
+		"lint": "eslint \"force-app/main/default/lwc/**/*.js\"",
+		"test:lwc": "sfdx-lwc-jest",
+		"test:lwc:coverage": "sfdx-lwc-jest --coverage",
+		"test:apex": "sf apex run test --target-org dtp-dev --result-format human --code-coverage --wait 10",
+		"deploy": "sf project deploy start --target-org dtp-dev --source-dir force-app --test-level NoTestRun --wait 10",
+		"deploy:validate": "sf project deploy start --target-org dtp-dev --source-dir force-app --test-level RunLocalTests --dry-run --wait 10",
+		"verify": "npm run format:check && npm run lint && npm run test:lwc:coverage && npm run deploy:validate && npm run deploy && npm run test:apex"
+	},
+	"devDependencies": {
+		"@lwc/eslint-plugin-lwc": "3.5.0",
+		"@salesforce/eslint-config-lwc": "4.1.2",
+		"@salesforce/eslint-plugin-lightning": "2.0.0",
+		"@salesforce/sfdx-lwc-jest": "7.9.0",
+		"eslint": "9.39.5",
+		"eslint-plugin-import": "2.32.0",
+		"eslint-plugin-jest": "29.17.1",
+		"prettier": "3.10.1",
+		"prettier-plugin-apex": "2.4.0"
+	}
+}

@@ -4,7 +4,7 @@ A feature-rich Lightning Web Component datatable for the Salesforce platform. Th
 
 ## Status
 
-Task 0: engineering workflows and validation org setup.
+Task 1 complete: Salesforce DX scaffold, formatter/linter setup, validation scripts, and a verified metadata smoke slice.
 
 ## Repository layout
 
@@ -37,4 +37,17 @@ This project uses neutral product terminology only: `datatable-plus`, `<c-datata
 
 ## Commands
 
-Task 1 introduces the `package.json` scripts. This section will be updated in that task with the exact commands and their descriptions.
+| Command                     | Description                                             |
+| --------------------------- | ------------------------------------------------------- |
+| `npm install`               | Install pinned development tooling                      |
+| `npm run format`            | Apply the gofmt-inspired formatter                      |
+| `npm run format:check`      | Fail if any tracked file is not formatted               |
+| `npm run lint`              | Lint local LWC JavaScript                               |
+| `npm run test:lwc`          | Run LWC unit tests                                      |
+| `npm run test:lwc:coverage` | Run LWC unit tests with coverage                        |
+| `npm run test:apex`         | Run Apex tests in the validation org                    |
+| `npm run deploy`            | Deploy source to the validation org without Apex tests  |
+| `npm run deploy:validate`   | Validate a deploy with local Apex tests, without saving |
+| `npm run verify`            | Run the full task verification gate                     |
+
+See [CONSTRAINTS.md](CONSTRAINTS.md) for the thresholds and [tooling decisions](docs/tooling.md) for the sources behind the configuration.
