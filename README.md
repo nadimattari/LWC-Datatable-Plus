@@ -4,7 +4,7 @@ A feature-rich Lightning Web Component datatable for the Salesforce platform. Th
 
 ## Status
 
-Task 1 complete: Salesforce DX scaffold, formatter/linter setup, validation scripts, and a verified metadata smoke slice.
+Task 1 complete. The Task 2 V1 specification, capability map, API contract, and decision records are approved. Official API sources are verified in [tooling decisions](docs/tooling.md); the implementation plan is awaiting approval before code starts.
 
 ## Repository layout
 
@@ -15,6 +15,10 @@ Task 1 complete: Salesforce DX scaffold, formatter/linter setup, validation scri
 - `.opencode/references/` — shared quality checklists
 - `.opencode/commands/` — lifecycle command wrappers
 - `AGENTS.md` — project rules for humans and agents
+
+## Architecture
+
+The platform datatable is the rendering core. Custom LWC layers add data requests, search, pagination, and selection forwarding; an Apex query service supplies sorted, searched, and paginated records. See the [capability map](docs/capability-map.md), [V1 spec](docs/spec.md), [API contract](docs/api.md), and [decision records](docs/decisions/) for the approved boundaries.
 
 ## Development workflow
 

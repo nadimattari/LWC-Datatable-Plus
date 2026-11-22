@@ -1,0 +1,123 @@
+# datatable-plus API — V1
+
+Status: approved — V1 contract
+
+This document is the contract. Implementation follows it; consumers may rely on every field documented here.
+
+## Component: `<c-datatable-plus>`
+
+### Public properties
+
+| Name            | Type     | Required | Default | Contract                                                                                |
+| --------------- | -------- | -------- | ------- | --------------------------------------------------------------------------------------- |
+| `objectApiName` | `String` | yes      | —       | API name of the queried object. Must exist and be accessible to the user.               |
+| `columns`       | `Array`  | yes      | —       | Platform-compatible column definitions. Each item must include `fieldName` and `label`. |
+| `keyField`      | `String` | no       | `Id`    | Passed to the base datatable as its row key.                                            |
+| `pageSize`      | `Number` | no       | `20`    | Clamped to `1..200`. Invalid values use the default.                                    |
+| `searchFields`  | `Array`  | no       | `[]`    | Field API names searched by `searchTerm`. Empty disables search.                        |
+| `title`         | `String` | no       | `''`    | Optional heading rendered above the controls.                                           |
+
+Properties are additive. Later versions may add optional properties but will not change these types or remove them.
+
+### Public methods
+
+| Name        | Contract                                                                                    |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| `refresh()` | Re-runs the current query with unchanged sort, page, and search state. Returns `undefined`. |
+
+### Events
+
+All events use a single `detail` object, bubble, and are composed.
+
+| Name              | `detail` shape                                                                | When it fires                       |
+| ----------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
+| `selectionchange` | `{selectedRows: Array, selectedRowKeys: Array}`                               | Base datatable selection changes.   |
+| `datachange`      | `{rows: Array, totalItemCount: Number, pageNumber: Number, pageSize: Number}` | A query succeeds.                   |
+| `error`           | `{errorCode: String, message: String}`                                        | A query returns a structured error. |
+
+Event names and detail fields are stable. Consumers should ignore unknown detail fields added later.
+
+## Service boundary
+
+The Apex boundary is the static method `DatatablePlusQueryService.query(DatatablePlusQueryRequest request)`. It is annotated `@AuraEnabled(cacheable=true)` and is called imperatively from the component.
+
+The request, response, and error types are top-level Apex classes: `DatatablePlusQueryRequest`, `DatatablePlusQueryResponse`, and `DatatablePlusQueryError`. Apex inner classes cannot be used as parameters or return values for methods called from an LWC, so V1 does not use them at this boundary. The response `rows` value is a list of sObject records whose field names match the requested fields; it is not a map.
+
+Sources: [Expose Apex Methods to Components](https://developer.salesforce.com/docs/platform/lwc/guide/apex-expose-method.html) and [Call Apex Methods Imperatively](https://developer.salesforce.com/docs/platform/lwc/guide/apex-call-imperative.html), verified in [tooling.md](tooling.md).
+
+## Query request
+
+The component sends this shape to the Apex service:
+
+```js
+{
+	objectApiName: 'Account',
+	fields: ['Id', 'Name', 'Industry'],
+	searchFields: ['Name'],
+	searchTerm: 'acme',
+	sortBy: 'Name',
+	sortDirection: 'ASC',
+	pageNumber: 1,
+	pageSize: 20
+}
+```
+
+`sortDirection` is `ASC`, `DESC`, or `null`. `pageNumber` is 1-based.
+
+## Query response
+
+The Apex service always returns one envelope shape:
+
+```js
+{
+	ok: true,
+	rows: [{Id: '001...', Name: 'Acme'}],
+	totalItemCount: 42,
+	pageNumber: 1,
+	pageSize: 20
+}
+```
+
+On an expected failure:
+
+```js
+{
+	ok: false,
+	rows: [],
+	totalItemCount: 0,
+	pageNumber: 1,
+	pageSize: 20,
+	error: {
+		errorCode: 'INVALID_SEARCH_FIELD',
+		message: 'Name is not a searchable field for Account'
+	}
+}
+```
+
+### Error codes
+
+| Code                   | Meaning                                                |
+| ---------------------- | ------------------------------------------------------ |
+| `INVALID_INPUT`        | Required request fields are missing or out of range.   |
+| `INVALID_OBJECT`       | Object API name does not exist or is not accessible.   |
+| `INVALID_FIELD`        | A requested field does not exist or is not accessible. |
+| `INVALID_SEARCH_FIELD` | A search field is not text-searchable.                 |
+| `QUERY_FAILED`         | SOQL execution failed unexpectedly.                    |
+
+Expected failures are returned in the envelope, not thrown as `AuraHandledException`. Unexpected Apex exceptions are caught by the service, logged, and converted to `QUERY_FAILED` with a generic message. Internal exception details never reach the client.
+
+## Validation rules
+
+- `objectApiName`, `fields`, and `pageSize` are required.
+- `pageSize` is clamped to `1..200` at the component boundary.
+- `pageNumber` is clamped to `>= 1` at the component boundary.
+- Field API names in `fields` and `searchFields` are matched against the object describe before being placed in SOQL.
+- Only `STRING`, `TEXTAREA`, `EMAIL`, `URL`, and `PHONE` fields may appear in `searchFields`.
+- Search text is bound as a parameter. It is never concatenated into SOQL text.
+- Sorting is applied only to a field present in `fields`.
+
+## Compatibility notes
+
+- V1 queries one object. Relationship paths in `fieldName` are not supported.
+- Selection is page-scoped. The component clears `selectedRows` and `selectedRowKeys` after each successful query.
+- The base datatable controls cell rendering; this component does not supply a custom cell renderer in V1.
