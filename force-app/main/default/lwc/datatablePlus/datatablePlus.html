@@ -1,0 +1,27 @@
+<template>
+	<div class="datatable-plus">
+		<h2 lwc:if={hasTitle} data-id="title" class="title">{normalizedTitle}</h2>
+		<p data-id="statusMessage" class="slds-assistive-text" role="status" aria-live="polite">
+			{statusMessage}
+		</p>
+		<p
+			lwc:if={error}
+			data-id="errorMessage"
+			class="error-message slds-text-color_error"
+			role="alert"
+		>
+			{errorMessage}
+		</p>
+		<p lwc:if={showEmptyState} data-id="emptyMessage" class="empty-message">
+			No records to display.
+		</p>
+		<lightning-datatable
+			data-id="datatable"
+			key-field={keyField}
+			columns={tableColumns}
+			data={rows}
+			is-loading={isLoading}
+			aria-label={tableLabel}
+		></lightning-datatable>
+	</div>
+</template>

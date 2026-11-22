@@ -12,14 +12,14 @@ This document is the contract. Implementation follows it; consumers may rely on 
 
 ### Public properties
 
-| Name            | Type     | Required | Default | Contract                                                                                |
-| --------------- | -------- | -------- | ------- | --------------------------------------------------------------------------------------- |
-| `objectApiName` | `String` | yes      | —       | API name of the queried object. Must exist and be accessible to the user.               |
-| `columns`       | `Array`  | yes      | —       | Platform-compatible column definitions. Each item must include `fieldName` and `label`. |
-| `keyField`      | `String` | no       | `Id`    | Passed to the base datatable as its row key.                                            |
-| `pageSize`      | `Number` | no       | `20`    | Clamped to `1..200`. Invalid values use the default.                                    |
-| `searchFields`  | `Array`  | no       | `[]`    | Field API names searched by `searchTerm`. Empty disables search.                        |
-| `title`         | `String` | no       | `''`    | Optional heading rendered above the controls.                                           |
+| Name            | Type     | Required | Default | Contract                                                                                                                        |
+| --------------- | -------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `objectApiName` | `String` | yes      | —       | API name of the queried object. Must exist and be accessible to the user.                                                       |
+| `columns`       | `Array`  | yes      | —       | Platform-compatible column definitions. Each item must include `fieldName` and `label`; requested fields come from `fieldName`. |
+| `keyField`      | `String` | no       | `Id`    | Passed to the base datatable as its row key and included in requested fields.                                                   |
+| `pageSize`      | `Number` | no       | `20`    | Clamped to `1..200`. Invalid values use the default.                                                                            |
+| `searchFields`  | `Array`  | no       | `[]`    | Field API names searched by `searchTerm`. Empty disables search.                                                                |
+| `title`         | `String` | no       | `''`    | Optional heading rendered above the controls.                                                                                   |
 
 Properties are additive. Later versions may add optional properties but will not change these types or remove them.
 
@@ -33,13 +33,19 @@ Properties are additive. Later versions may add optional properties but will not
 
 All events use a single `detail` object, bubble, and are composed.
 
-| Name              | `detail` shape                                                                | When it fires                       |
-| ----------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
-| `selectionchange` | `{selectedRows: Array, selectedRowKeys: Array}`                               | Base datatable selection changes.   |
-| `datachange`      | `{rows: Array, totalItemCount: Number, pageNumber: Number, pageSize: Number}` | A query succeeds.                   |
-| `error`           | `{errorCode: String, message: String}`                                        | A query returns a structured error. |
+| Name              | `detail` shape                                                                | When it fires                               |
+| ----------------- | ----------------------------------------------------------------------------- | ------------------------------------------- |
+| `selectionchange` | `{selectedRows: Array, selectedRowKeys: Array}`                               | Base datatable selection changes.           |
+| `datachange`      | `{rows: Array, totalItemCount: Number, pageNumber: Number, pageSize: Number}` | A query succeeds.                           |
+| `error`           | `{errorCode: String, message: String}`                                        | A query fails, rejects, or has no response. |
 
 Event names and detail fields are stable. Consumers should ignore unknown detail fields added later.
+
+### Rendering and states
+
+On insertion, the shell requests page one with no sort or search term. It sets the platform datatable's loading state while the promise is pending, then passes the returned rows, columns, and key field to the renderer. Events are dispatched only after the loading flag is cleared. A successful response clears any prior error and emits `datachange`; an error response, a rejected Apex promise, or a missing response clears the rows, shows an inline `role="alert"` message, and emits `error` with the structured code and message. A persistent polite status region announces loading, loaded, and empty results; failures are announced only by the alert so messages are not duplicated.
+
+The table's accessible label is `title` when supplied, otherwise `objectApiName`, otherwise `Records`. Array properties are supplied by a wrapping component; App Builder configuration exposes only the scalar properties `objectApiName`, `keyField`, `pageSize`, and `title`.
 
 ## Internal query-controls contract
 
@@ -87,7 +93,7 @@ The component sends this shape to the Apex service:
 }
 ```
 
-`sortDirection` is `ASC`, `DESC`, or `null`. `pageNumber` is 1-based. The component builds this request with shared helpers that copy field arrays, normalize lower-case sort directions to upper-case, reject unknown directions as `null`, clamp `pageNumber` to at least 1, and clamp `pageSize` to `1..200`. Non-finite page values use the defaults from the public property table.
+`sortDirection` is `ASC`, `DESC`, or `null`. `pageNumber` is 1-based. The `fields` value is the ordered, de-duplicated union of `keyField` and the string `fieldName` of each valid column. The component builds this request with shared helpers that copy field arrays, normalize lower-case sort directions to upper-case, reject unknown directions as `null`, clamp `pageNumber` to at least 1, and clamp `pageSize` to `1..200`. Non-finite page values use the defaults from the public property table.
 
 The Apex request DTO defaults are `''` for `objectApiName` and `searchTerm`, empty lists for `fields` and `searchFields`, `null` for `sortBy` and `sortDirection`, `1` for `pageNumber`, and `20` for `pageSize`.
 

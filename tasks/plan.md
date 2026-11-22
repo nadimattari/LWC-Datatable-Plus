@@ -63,7 +63,7 @@ Build the agreed Core MVP as thin vertical slices: first the shared contract and
     - Files likely touched: `queryControls/queryControls.html`, `.js`, `.css`, `.js-meta.xml`, `__tests__/queryControls.test.js`.
     - Estimated scope: M.
 
-- [ ] Task 8: Render rows and load data in the shell
+- [x] Task 8: Render rows and load data in the shell
     - Acceptance: `<c-datatable-plus>` exposes documented public properties, calls the Apex service, renders rows through the platform datatable, and shows loading and error states.
     - Verify: `npm run lint`, `npm run test:lwc:coverage`, `npm run deploy:validate`, `npm run format:check`.
     - Dependencies: Tasks 6 and 7.
@@ -71,7 +71,7 @@ Build the agreed Core MVP as thin vertical slices: first the shared contract and
     - Estimated scope: M.
 
 - [ ] Task 9: Wire sorting, pagination, search, selection, and refresh
-    - Acceptance: base sort and selection events update state and emit documented events; query-control events trigger new requests; `refresh()` reuses the active request.
+    - Acceptance: base sort and selection events update state and emit documented events; query-control events trigger new requests; `refresh()` reuses the active request; a request identity prevents a stale response from overwriting newer state.
     - Verify: `npm run lint`, `npm run test:lwc:coverage`, `npm run format:check`.
     - Dependencies: Task 8.
     - Files likely touched: `datatablePlus/datatablePlus.js`, `__tests__/datatablePlus.test.js`.
