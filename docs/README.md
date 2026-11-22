@@ -15,4 +15,6 @@
 - [Implementation plan](../tasks/plan.md) — approved slices and verification gates
 - [Task checklist](../tasks/todo.md) — approved task checklist
 
+V1 is implemented and verified. The [tooling verification record](tooling.md#v1-verification) lists the final gate results, accessibility pass, dependency audit, rollback path, and the manual in-org render and restricted-user verification gaps.
+
 Each task updates this index when it adds or changes a document.

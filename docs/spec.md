@@ -134,17 +134,19 @@ Base component calls are asserted through the Jest stubs supplied by the test ru
 
 ## Success Criteria
 
-- [ ] `<c-datatable-plus>` renders rows through the platform datatable in `dtp-dev`.
-- [ ] `objectApiName`, `columns`, `keyField`, `pageSize`, `searchFields`, and `title` behave as documented in [api.md](api.md).
-- [ ] Sorting emits a new query and the service applies the requested field and direction.
-- [ ] Pagination exposes first, previous, next, and last controls and reports the correct total count.
-- [ ] Search is debounced, validates search fields, and returns the structured error envelope for invalid input.
-- [ ] Row selection emits `selectionchange` with the current page's rows and keys.
-- [ ] `refresh()` re-runs the active query without changing its parameters.
-- [ ] LWC coverage is at least 80% and Apex coverage is at least 75%.
-- [ ] Deploy validation and Apex tests pass against `dtp-dev`.
-- [ ] A keyboard pass confirms controls are reachable and labelled.
-- [ ] README, docs index, API reference, ADRs, and capability map are updated before the implementation commit.
+- [x] `<c-datatable-plus>` renders rows through the platform datatable in Jest-rendered tests and its metadata deploys cleanly to `dtp-dev`; a manual in-org visual render check was not performed.
+- [x] `objectApiName`, `columns`, `keyField`, `pageSize`, `searchFields`, and `title` behave as documented in [api.md](api.md).
+- [x] Sorting emits a new query and the service applies the requested field and direction.
+- [x] Pagination exposes first, previous, next, and last controls and reports the correct total count.
+- [x] Search is debounced, validates search fields, and returns the structured error envelope for invalid input.
+- [x] Row selection emits `selectionchange` with the current page's rows and keys.
+- [x] `refresh()` re-runs the active query without changing its parameters.
+- [x] LWC coverage is at least 80% and Apex coverage is at least 75%.
+- [x] Deploy validation and Apex tests pass against `dtp-dev`.
+- [x] A keyboard pass confirms controls are reachable and labelled.
+- [x] README, docs index, API reference, ADRs, and capability map are updated before the implementation commit.
+
+Verification note: the authenticated `dtp-dev` user has the System Administrator profile, so restricted-user object and field accessibility was not exercised. The gap and the service-side enforcement are recorded in [tooling.md](tooling.md#v1-verification).
 
 ## Out of Scope (Deferred)
 

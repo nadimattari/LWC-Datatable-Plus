@@ -85,7 +85,7 @@ Build the agreed Core MVP as thin vertical slices: first the shared contract and
 
 ### Phase 4: Verification and Release
 
-- [ ] Task 10: Complete V1 verification and documentation
+- [x] Task 10: Complete V1 verification and documentation
     - Acceptance: full gate passes; restricted-user object/field accessibility is verified or its verification gap is documented; README, docs index, API reference, ADR statuses, and capability map reflect the shipped V1; review findings are resolved; one descriptive commit is pushed.
     - Verify: `npm run verify`, five-axis review, secret and naming scans.
     - Dependencies: Task 9.
@@ -94,8 +94,8 @@ Build the agreed Core MVP as thin vertical slices: first the shared contract and
 
 ### Checkpoint: Complete
 
-- [ ] All V1 success criteria in `docs/spec.md` are met.
-- [ ] Main is deployable and the Task 10 commit is pushed.
+- [x] All V1 success criteria in `docs/spec.md` are met.
+- [x] Main is deployable and the Task 10 commit is pushed.
 
 ## Risks and Mitigations
 

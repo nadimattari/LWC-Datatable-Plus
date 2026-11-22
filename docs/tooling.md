@@ -125,6 +125,18 @@ Sources verified through the in-app browser on 2026-11-22:
 | [Call Apex Methods Imperatively](https://developer.salesforce.com/docs/platform/lwc/guide/apex-call-imperative.html)                                               | An imported imperative Apex function returns a promise, and the component controls when the single response is requested.                                |
 | [Create and Dispatch Events](https://developer.salesforce.com/docs/platform/lwc/guide/events-create-dispatch.html)                                                 | Custom events carry a copied `detail` object; public events set `bubbles` and `composed` so consumers outside the shadow boundary receive them.          |
 
+## V1 verification
+
+Final verification ran on 2026-11-22 against the `dtp-dev` validation org at API 68.0 with the explicit CLI path required by this environment. `npm run verify` passed end to end: formatter and lint clean; 81 LWC tests with 100% statements, functions, and lines and 99.14% branches; deploy validation with 26 of 26 local Apex tests successful; deployment succeeded; and 26 Apex tests passed with 93% org-wide coverage. The Jest cache was cleared before final coverage collection so every component module was included in the report.
+
+`npm audit --audit-level=high` passed. The dependency tree reports low and moderate advisories in development tooling whose fixes require breaking major-version changes; no high or critical advisory blocks V1. Secret, naming, suppression, skipped-test, and stub scans found no added violations.
+
+The keyboard pass is Jest-rendered: the internal controls are asserted as a labelled search input and four labelled page buttons with correct disabled boundary states. The shell keeps one polite status region in the DOM and uses an alert only for query failures.
+
+Manual in-org render gap: row rendering is verified through Jest-rendered tests and the metadata deploy gate, but no manual visual check of a populated table was performed inside `dtp-dev`. Restricted-user gap: the authenticated `dtp-dev` user has the System Administrator profile, so object and field accessibility was not exercised as a restricted user. The Apex service still checks `isAccessible()` for the object and every requested field and runs both count and row queries with `AccessLevel.USER_MODE`. A restricted-user smoke check remains required before production use.
+
+V1 was deployed only to the validation org; no production rollout or feature flag was used. Rollback is metadata-only: revert the V1 metadata and documentation commits from `main`, then redeploy the pre-V1 source from `736b08f`. No schema migration, data backfill, or external integration is included in V1.
+
 ## Task 1 smoke slice
 
 Two small, production-shaped files prove that the formatter, LWC test runner, deploy, and Apex test runner are wired correctly:

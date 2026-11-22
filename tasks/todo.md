@@ -11,5 +11,5 @@ Source plan: [plan.md](plan.md)
 - [x] Task 8: Render rows and load data in the shell
 - [x] Task 9: Wire sorting, pagination, search, selection, and refresh
 - [x] Checkpoint: Core UI flow tests and keyboard reachability pass
-- [ ] Task 10: Complete V1 verification and documentation
-- [ ] Checkpoint: All success criteria met and commit pushed
+- [x] Task 10: Complete V1 verification and documentation
+- [x] Checkpoint: All success criteria met and commit pushed

@@ -1,6 +1,6 @@
 # Capability Map: datatable-plus V1
 
-Status: approved — V1 module boundaries
+Status: implemented — V1 module boundaries
 
 | Module id          | Responsibility                                                                   | Depends on                         |
 | ------------------ | -------------------------------------------------------------------------------- | ---------------------------------- |
@@ -13,6 +13,8 @@ Status: approved — V1 module boundaries
 Build order: `data-contract` → `apex-query-service` and `query-controls` → `datatable-shell` → `verification`.
 
 Dependency direction is one-way. `query-controls` never imports from `datatable-shell`; it emits a request through the shared contract. `datatable-shell` owns all state and orchestration.
+
+V1 delivery: every module in this map is implemented. The shell wires controls, sorting, selection, refresh, and stale-response guarding through the Apex service. Verification results and the restricted-user gap are recorded in [tooling.md](tooling.md#v1-verification).
 
 ## V1 boundary
 

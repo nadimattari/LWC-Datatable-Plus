@@ -1,8 +1,8 @@
 # datatable-plus API — V1
 
-Status: approved — V1 contract
+Status: implemented — V1 contract
 
-This document is the contract. Implementation follows it; consumers may rely on every field documented here.
+This document is the shipped contract. Consumers may rely on every field documented here.
 
 ## Apex service boundary
 

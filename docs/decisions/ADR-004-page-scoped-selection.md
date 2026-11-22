@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted — implemented in V1
 
 ## Date
 

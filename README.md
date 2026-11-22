@@ -4,7 +4,7 @@ A feature-rich Lightning Web Component datatable for the Salesforce platform. Th
 
 ## Status
 
-Task 9 complete. The V1 specification, capability map, API contract, decision records, and implementation plan are approved. Shared query-request helpers, the Apex data service, the internal query controls, and the `<c-datatable-plus>` shell are covered by tests; sorting, pagination, search, selection, and refresh are wired through one guarded query pipeline. Official API sources are recorded in [tooling decisions](docs/tooling.md).
+V1 is implemented and verified. `<c-datatable-plus>` renders Apex-backed rows through the platform datatable with sorting, pagination, search, page-scoped selection, and a public refresh method. The specification, capability map, API contract, decision records, implementation plan, and official API sources reflect the shipped scope; final gate results and the manual in-org render and restricted-user verification gaps are recorded in [tooling decisions](docs/tooling.md#v1-verification).
 
 ## Repository layout
 
