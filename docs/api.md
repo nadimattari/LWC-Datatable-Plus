@@ -85,13 +85,13 @@ The component sends this shape to the Apex service:
 ```js
 {
 	objectApiName: 'Account',
-	fields: ['Id', 'Name', 'Industry'],
-	searchFields: ['Name'],
-	searchTerm: 'acme',
-	sortBy: 'Name',
+	fields       : ['Id', 'Name', 'Industry'],
+	searchFields : ['Name'],
+	searchTerm   : 'acme',
+	sortBy       : 'Name',
 	sortDirection: 'ASC',
-	pageNumber: 1,
-	pageSize: 20
+	pageNumber   : 1,
+	pageSize     : 20
 }
 ```
 
@@ -105,11 +105,11 @@ The Apex service always returns one envelope shape. `pageNumber` and `pageSize` 
 
 ```js
 {
-	ok: true,
-	rows: [{Id: '001...', Name: 'Acme'}],
+	ok            : true,
+	rows          : [{Id: '001...', Name: 'Acme'}],
 	totalItemCount: 42,
-	pageNumber: 1,
-	pageSize: 20
+	pageNumber    : 1,
+	pageSize      : 20
 }
 ```
 
@@ -117,11 +117,11 @@ On an expected failure:
 
 ```js
 {
-	ok: false,
-	rows: [],
+	ok            : false,
+	rows          : [],
 	totalItemCount: 0,
-	pageNumber: 1,
-	pageSize: 20,
+	pageNumber    : 1,
+	pageSize      : 20,
 	error: {
 		errorCode: 'INVALID_SEARCH_FIELD',
 		message: 'Name is not a searchable field for Account'
