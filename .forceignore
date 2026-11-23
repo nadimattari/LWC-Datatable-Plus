@@ -4,3 +4,5 @@ coverage/**
 **/*.test.js
 **/jest.config.js
 **/.gitkeep
+**/jsconfig.json
+**/.eslintrc.json
