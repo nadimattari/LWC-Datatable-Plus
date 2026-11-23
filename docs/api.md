@@ -12,14 +12,14 @@ This document is the shipped contract. Consumers may rely on every field documen
 
 ### Public properties
 
-| Name            | Type     | Required | Default | Contract                                                                                                                        |
-| --------------- | -------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `objectApiName` | `String` | yes      | —       | API name of the queried object. Must exist and be accessible to the user.                                                       |
-| `columns`       | `Array`  | yes      | —       | Platform-compatible column definitions. Each item must include `fieldName` and `label`; requested fields come from `fieldName`. |
-| `keyField`      | `String` | no       | `Id`    | Passed to the base datatable as its row key and included in requested fields.                                                   |
-| `pageSize`      | `Number` | no       | `20`    | Clamped to `1..200`. Invalid values use the default.                                                                            |
-| `searchFields`  | `Array`  | no       | `[]`    | Field API names searched by `searchTerm`. Empty disables search.                                                                |
-| `title`         | `String` | no       | `''`    | Optional heading rendered above the controls.                                                                                   |
+| Name            | Type     | Required | Default | Contract                                                                                                                                                                       |
+| --------------- | -------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `objectApiName` | `String` | yes      | —       | API name of the queried object. Must exist and be accessible to the user.                                                                                                      |
+| `columns`       | `Array`  | yes      | —       | Platform-compatible column definitions. Each item must include `fieldName` and `label`; add `sortable: true` to enable header sorting. Requested fields come from `fieldName`. |
+| `keyField`      | `String` | no       | `Id`    | Passed to the base datatable as its row key and included in requested fields.                                                                                                  |
+| `pageSize`      | `Number` | no       | `20`    | Clamped to `1..200`. Invalid values use the default.                                                                                                                           |
+| `searchFields`  | `Array`  | no       | `[]`    | Field API names searched by `searchTerm`. Empty disables search.                                                                                                               |
+| `title`         | `String` | no       | `''`    | Optional heading rendered above the controls.                                                                                                                                  |
 
 Properties are additive. Later versions may add optional properties but will not change these types or remove them.
 

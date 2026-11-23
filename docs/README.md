@@ -6,6 +6,7 @@
 - [V1 spec](spec.md) — requirements, scope, and acceptance criteria
 - [Capability map](capability-map.md) — module boundaries and build order
 - [API contract](api.md) — public component and data-service contracts
+- [Usage guide](how-to-use.md) — component-style examples, events, accessibility, and troubleshooting
 - [Tooling decisions](tooling.md) — formatter, test runner, Salesforce CLI sources, and verified official API citations
 - [Constraints](../CONSTRAINTS.md) — quality bar and enforcement points
 - [Decision records](decisions/) — architecture decisions and rationale, including top-level Apex DTOs

@@ -3,4 +3,5 @@ coverage/
 .sf/
 .sfdx/
 .opencode/
+.vscode/
 package-lock.json

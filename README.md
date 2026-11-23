@@ -4,7 +4,7 @@ A feature-rich Lightning Web Component datatable for the Salesforce platform. Th
 
 ## Status
 
-V1 is implemented and verified. `<c-datatable-plus>` renders Apex-backed rows through the platform datatable with sorting, pagination, search, page-scoped selection, and a public refresh method. The specification, capability map, API contract, decision records, implementation plan, and official API sources reflect the shipped scope; final gate results and the manual in-org render and restricted-user verification gaps are recorded in [tooling decisions](docs/tooling.md#v1-verification).
+V1 is implemented and verified. `<c-datatable-plus>` renders Apex-backed rows through the platform datatable with sorting, pagination, search, page-scoped selection, and a public refresh method. The specification, capability map, API contract, [usage guide](docs/how-to-use.md), decision records, implementation plan, and official API sources reflect the shipped scope; final gate results and the manual in-org render and restricted-user verification gaps are recorded in [tooling decisions](docs/tooling.md#v1-verification).
 
 ## Repository layout
 
