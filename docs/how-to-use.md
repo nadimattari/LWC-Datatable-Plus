@@ -14,24 +14,26 @@ page-scoped selection, and a public refresh method.
 
 ## Contents
 
-- [Usage](#usage)
-- [Examples](#examples)
-    - [Basic](#basic)
-    - [Search](#search)
-    - [Sorting](#sorting)
-    - [Pagination](#pagination)
-    - [Selection](#selection)
-    - [Refresh](#refresh)
-- [API](#api)
-    - [Properties](#properties)
-    - [Events](#events)
-    - [Methods](#methods)
-- [Accessibility](#accessibility)
-    - [Screen reader](#screen-reader)
-    - [Keyboard support](#keyboard-support)
-- [Error codes](#error-codes)
-- [Troubleshooting](#troubleshooting)
-- [Resources](#resources)
+- [Datatable Plus](#datatable-plus)
+	- [Contents](#contents)
+	- [Usage](#usage)
+	- [Examples](#examples)
+		- [Basic](#basic)
+		- [Search](#search)
+		- [Sorting](#sorting)
+		- [Pagination](#pagination)
+		- [Selection](#selection)
+		- [Refresh](#refresh)
+	- [API](#api)
+		- [Properties](#properties)
+		- [Events](#events)
+		- [Methods](#methods)
+	- [Accessibility](#accessibility)
+		- [Screen reader](#screen-reader)
+		- [Keyboard support](#keyboard-support)
+	- [Error codes](#error-codes)
+	- [Troubleshooting](#troubleshooting)
+	- [Resources](#resources)
 
 ## Usage
 
@@ -53,20 +55,20 @@ component loads page one when the wrapper is inserted.
 import {LightningElement} from 'lwc'
 
 const COLUMNS = [
-	{label: 'Account Name', fieldName: 'Name', type: 'text', sortable: true},
-	{label: 'Industry', fieldName: 'Industry', type: 'text', sortable: true},
+	{label: 'Account Name', fieldName: 'Name',        type: 'text', sortable: true},
+	{label: 'Industry',     fieldName: 'Industry',    type: 'text', sortable: true},
 	{label: 'Billing City', fieldName: 'BillingCity', type: 'text', sortable: true}
 ]
 
 const SEARCH_FIELDS = ['Name', 'BillingCity']
 
 export default class AccountExplorer extends LightningElement {
-	columns = COLUMNS
-	searchFields = SEARCH_FIELDS
-	pageSize = 20
+	columns         = COLUMNS
+	searchFields    = SEARCH_FIELDS
+	pageSize        = 20
 	selectedRowKeys = []
-	statusMessage = ''
-	errorMessage = ''
+	statusMessage   = ''
+	errorMessage    = ''
 
 	get selectedCount() {
 		return this.selectedRowKeys.length
@@ -75,7 +77,7 @@ export default class AccountExplorer extends LightningElement {
 	handleDataChange(event) {
 		const {pageNumber, pageSize, totalItemCount} = event.detail
 
-		this.errorMessage = ''
+		this.errorMessage  = ''
 		this.statusMessage = `Page ${pageNumber} shows ${pageSize} of ${totalItemCount} records.`
 	}
 
@@ -84,7 +86,7 @@ export default class AccountExplorer extends LightningElement {
 	}
 
 	handleQueryError(event) {
-		this.errorMessage = event.detail.message
+		this.errorMessage  = event.detail.message
 		this.statusMessage = ''
 	}
 
@@ -107,21 +109,21 @@ export default class AccountExplorer extends LightningElement {
 
 			<p lwc:if={statusMessage} class="slds-m-top_small">{statusMessage}</p>
 			<p lwc:if={selectedCount} class="slds-m-top_small">Selected rows: {selectedCount}</p>
-			<p lwc:if={errorMessage} class="slds-m-top_small slds-text-color_error">
+			<p lwc:if={errorMessage}  class="slds-m-top_small slds-text-color_error">
 				{errorMessage}
 			</p>
 
 			<c-datatable-plus
-				lwc:ref="accountsTable"
-				object-api-name="Account"
-				columns={columns}
-				key-field="Id"
-				page-size={pageSize}
-				search-fields={searchFields}
-				title="Accounts"
-				ondatachange={handleDataChange}
-				onselectionchange={handleSelectionChange}
-				onerror={handleQueryError}
+				lwc:ref           = "accountsTable"
+				object-api-name   = "Account"
+				columns           = {columns}
+				key-field         = "Id"
+				page-size         = {pageSize}
+				search-fields     = {searchFields}
+				title             = "Accounts"
+				ondatachange      = {handleDataChange}
+				onselectionchange = {handleSelectionChange}
+				onerror           = {handleQueryError}
 			></c-datatable-plus>
 		</div>
 	</lightning-card>
@@ -167,8 +169,8 @@ sortable in the object describe and included in the requested fields.
 
 ```js
 const COLUMNS = [
-	{label: 'Account Name', fieldName: 'Name', type: 'text', sortable: true},
-	{label: 'Industry', fieldName: 'Industry', type: 'text', sortable: true}
+	{label: 'Account Name', fieldName: 'Name',     type: 'text', sortable: true},
+	{label: 'Industry',     fieldName: 'Industry', type: 'text', sortable: true}
 ]
 ```
 
